@@ -43,6 +43,7 @@
 #include "catalog/pg_foreign_data_wrapper.h"
 #include "catalog/pg_foreign_server.h"
 #include "catalog/pg_foreign_table.h"
+#include "catalog/pg_initdbinfo.h"
 #include "catalog/pg_language.h"
 #include "catalog/pg_namespace.h"
 #include "catalog/pg_opclass.h"
@@ -486,6 +487,28 @@ static const struct cachedesc cacheinfo[] = {
 		},
 		64
 	},
+	{InitdbinfoRelationId,                  /* INITDBINFOID */
+           InitdbInfoOidIndexId,
+           1,
+           {
+                   Anum_pg_initdbinfo_id,
+                   0,
+                   0,
+                   0
+           },
+           4
+    },
+    {InitdbinfoRelationId,                  /* INITDBINFONAME */                 
+           InitdbInfoUsernameIndexId,
+           1,
+           {
+                   Anum_pg_initdbinfo_username,
+                   0,
+                   0,
+                   0
+           },
+           4
+    },
 	{LanguageRelationId,		/* LANGNAME */
 		LanguageNameIndexId,
 		1,
