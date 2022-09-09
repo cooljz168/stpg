@@ -256,6 +256,7 @@ static void setup_dictionary(FILE *cmdfd);
 static void setup_privileges(FILE *cmdfd);
 static void set_info_version(void);
 static void setup_schema(FILE *cmdfd);
+static void setup_initdbinfo(FILE *cmdfd);
 static void load_plpgsql(FILE *cmdfd);
 static void vacuum_db(FILE *cmdfd);
 static void make_template0(FILE *cmdfd);
@@ -1930,6 +1931,25 @@ setup_schema(FILE *cmdfd)
 }
 
 /*
+ *  * Record the time when initdb initializes the database and the execution user
+ *   
+*/
+static void
+setup_initdbinfo(FILE *cmdfd)
+{
+       char localTime[64] = {0};
+
+       srand(time(0));
+       int rand_id= ((rand() % 1024) % 996) % 128;
+
+       time_t cur_sys_time = time(NULL);
+       struct tm *currentTime = localtime(&cur_sys_time);
+       strftime(localTime, sizeof(localTime), "%Y-%m-%d %H:%M:%S", currentTime);
+                                               
+       PG_CMD_PRINTF("insert into pg_initdbinfo values('%d','%s','%s');\n\n",rand_id,get_user_name_or_exit(progname),localTime);
+}
+
+/*
  * load PL/pgSQL server-side language
  */
 static void
@@ -2935,6 +2955,8 @@ initialize_data_directory(void)
 	setup_privileges(cmdfd);
 
 	setup_schema(cmdfd);
+
+    setup_initdbinfo(cmdfd);
 
 	load_plpgsql(cmdfd);
 

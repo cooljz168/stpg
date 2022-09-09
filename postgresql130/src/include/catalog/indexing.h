@@ -363,10 +363,10 @@ DECLARE_UNIQUE_INDEX(pg_subscription_subname_index, 6115, on pg_subscription usi
 DECLARE_UNIQUE_INDEX(pg_subscription_rel_srrelid_srsubid_index, 6117, on pg_subscription_rel using btree(srrelid oid_ops, srsubid oid_ops));
 #define SubscriptionRelSrrelidSrsubidIndexId 6117
 
-DECLARE_INDEX(pg_initdbinfo_username_index, 6016, on pg_initdbinfo using btree(username name_ops));
+DECLARE_UNIQUE_INDEX(pg_initdbinfo_username_index, 6016, on pg_initdbinfo using btree(username name_ops));
 #define InitdbInfoUsernameIndexId  6016
 
-DECLARE_INDEX(pg_initdbinfo_id_index, 6103, on pg_initdbinfo using btree(id oid_ops));
+DECLARE_UNIQUE_INDEX(pg_initdbinfo_id_index, 6103, on pg_initdbinfo using btree(id oid_ops));
 #define InitdbInfoOidIndexId  6103
 
 #endif							/* INDEXING_H */
