@@ -4263,7 +4263,7 @@ else
   ac_save_c_werror_flag=$ac_c_werror_flag
    ac_c_werror_flag=yes
    ac_cv_prog_cc_g=no
-   CFLAGS="-g"
+   CFLAGS="-g3"
    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -4294,7 +4294,7 @@ if ac_fn_c_try_compile "$LINENO"; then :
 
 else
   ac_c_werror_flag=$ac_save_c_werror_flag
-	 CFLAGS="-g"
+	 CFLAGS="-g3"
 	 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -4322,13 +4322,13 @@ if test "$ac_test_CFLAGS" = set; then
   CFLAGS=$ac_save_CFLAGS
 elif test $ac_cv_prog_cc_g = yes; then
   if test "$GCC" = yes; then
-    CFLAGS="-g -O2"
+    CFLAGS="-g3"
   else
-    CFLAGS="-g"
+    CFLAGS="-g3"
   fi
 else
   if test "$GCC" = yes; then
-    CFLAGS="-O2"
+    CFLAGS="-g3"
   else
     CFLAGS=
   fi
@@ -4794,7 +4794,7 @@ else
   ac_save_cxx_werror_flag=$ac_cxx_werror_flag
    ac_cxx_werror_flag=yes
    ac_cv_prog_cxx_g=no
-   CXXFLAGS="-g"
+   CXXFLAGS="-g3"
    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -4825,7 +4825,7 @@ if ac_fn_cxx_try_compile "$LINENO"; then :
 
 else
   ac_cxx_werror_flag=$ac_save_cxx_werror_flag
-	 CXXFLAGS="-g"
+	 CXXFLAGS="-g3"
 	 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -4853,13 +4853,13 @@ if test "$ac_test_CXXFLAGS" = set; then
   CXXFLAGS=$ac_save_CXXFLAGS
 elif test $ac_cv_prog_cxx_g = yes; then
   if test "$GXX" = yes; then
-    CXXFLAGS="-g -O2"
+    CXXFLAGS="-g3"
   else
-    CXXFLAGS="-g"
+    CXXFLAGS="-g3"
   fi
 else
   if test "$GXX" = yes; then
-    CXXFLAGS="-O2"
+    CXXFLAGS="-g3"
   else
     CXXFLAGS=
   fi
@@ -5206,8 +5206,8 @@ unset CXXFLAGS
 # If the user specifies something in the environment, that is used.
 # else:  If the template file set something, that is used.
 # else:  If coverage was enabled, don't set anything.
-# else:  If the compiler is GCC, then we use -O2.
-# else:  If the compiler is something else, then we use -O, unless debugging.
+# else:  If the compiler is GCC, then we use -g3.
+# else:  If the compiler is something else, then we use -g3, unless debugging.
 
 if test "$ac_env_CFLAGS_set" = set; then
   CFLAGS=$ac_env_CFLAGS_value
@@ -5216,11 +5216,11 @@ elif test "${CFLAGS+set}" = set; then
 elif test "$enable_coverage" = yes; then
   : # no optimization by default
 elif test "$GCC" = yes; then
-  CFLAGS="-O2"
+  CFLAGS="-g3"
 else
-  # if the user selected debug mode, don't use -O
+  # if the user selected debug mode, don't use -g3
   if test "$enable_debug" != yes; then
-    CFLAGS="-O"
+    CFLAGS="-g3"
   fi
 fi
 
@@ -5231,29 +5231,29 @@ elif test "${CXXFLAGS+set}" = set; then
 elif test "$enable_coverage" = yes; then
   : # no optimization by default
 elif test "$GCC" = yes; then
-  CXXFLAGS="-O2"
+  CXXFLAGS="-g3"
 else
-  # if the user selected debug mode, don't use -O
+  # if the user selected debug mode, don't use -g3
   if test "$enable_debug" != yes; then
-    CXXFLAGS="-O"
+    CXXFLAGS="-g3"
   fi
 fi
 
-# When generating bitcode (for inlining) we always want to use -O2
+# When generating bitcode (for inlining) we always want to use -g3
 # even when --enable-debug is specified. The bitcode it's not going to
 # be used for line-by-line debugging, and JIT inlining doesn't work
-# without at least -O1 (otherwise clang will emit 'noinline'
+# without at least -g31 (otherwise clang will emit 'noinline'
 # attributes everywhere), which is bad for testing.  Still allow the
 # environment to override if done explicitly.
 if test "$ac_env_BITCODE_CFLAGS_set" = set; then
   BITCODE_CFLAGS=$ac_env_BITCODE_CFLAGS_value
 else
-  BITCODE_CFLAGS="-O2 $BITCODE_CFLAGS"
+  BITCODE_CFLAGS="-g3 $BITCODE_CFLAGS"
 fi
 if test "$ac_env_BITCODE_CXXFLAGS_set" = set; then
   BITCODE_CXXFLAGS=$ac_env_BITCODE_CXXFLAGS_value
 else
-  BITCODE_CXXFLAGS="-O2 $BITCODE_CXXFLAGS"
+  BITCODE_CXXFLAGS="-g3 $BITCODE_CXXFLAGS"
 fi
 
 # C[XX]FLAGS we determined above will be added back at the end
@@ -6965,11 +6965,11 @@ fi
 
 # supply -g if --enable-debug
 if test "$enable_debug" = yes && test "$ac_cv_prog_cc_g" = yes; then
-  CFLAGS="$CFLAGS -g"
+  CFLAGS="$CFLAGS -g3"
 fi
 
 if test "$enable_debug" = yes && test "$ac_cv_prog_cxx_g" = yes; then
-  CXXFLAGS="$CXXFLAGS -g"
+  CXXFLAGS="$CXXFLAGS -g3"
 fi
 
 # enable code coverage if --enable-coverage
