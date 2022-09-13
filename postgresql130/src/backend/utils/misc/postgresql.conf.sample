@@ -178,6 +178,7 @@
 #maintenance_io_concurrency = 10	# 1-1000; 0 disables prefetching
 #max_worker_processes = 8		# (change requires restart)
 #max_parallel_maintenance_workers = 2	# taken from max_parallel_workers
+#test_pgc_internal = 6	# taken from test_pgc_internal
 #max_parallel_workers_per_gather = 2	# taken from max_parallel_workers
 #parallel_leader_participation = on
 #max_parallel_workers = 8		# maximum number of max_worker_processes that

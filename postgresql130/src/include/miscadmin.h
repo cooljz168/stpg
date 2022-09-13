@@ -242,10 +242,14 @@ extern PGDLLIMPORT int IntervalStyle;
 
 extern bool enableFsync;
 extern PGDLLIMPORT bool allowSystemTableMods;
+extern PGDLLIMPORT bool test_pgc_backend;
+
 extern PGDLLIMPORT int work_mem;
 extern PGDLLIMPORT double hash_mem_multiplier;
 extern PGDLLIMPORT int maintenance_work_mem;
 extern PGDLLIMPORT int max_parallel_maintenance_workers;
+extern PGDLLIMPORT int test_pgc_internal;
+
 
 extern int	VacuumCostPageHit;
 extern int	VacuumCostPageMiss;

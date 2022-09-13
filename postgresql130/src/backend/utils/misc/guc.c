@@ -2040,6 +2040,17 @@ static struct config_bool ConfigureNamesBool[] =
 		NULL, NULL, NULL
 	},
 
+    {
+        {"test_pgc_backend", PGC_USERSET, DEVELOPER_OPTIONS,
+            gettext_noop("Test add guc test_pgc_backend parameter."),
+            NULL,
+            GUC_NOT_IN_SAMPLE
+        },
+        &test_pgc_backend,
+        false,
+        NULL, NULL, NULL
+    },
+
 	/* End-of-list marker */
 	{
 		{NULL, 0, 0, NULL, NULL}, NULL, false, NULL, NULL, NULL
@@ -3380,6 +3391,16 @@ static struct config_int ConfigureNamesInt[] =
 		0, 0, INT_MAX,
 		NULL, assign_tcp_user_timeout, show_tcp_user_timeout
 	},
+
+	{
+		{"test_pgc_internal", PGC_USERSET, RESOURCES_ASYNCHRONOUS,
+			gettext_noop("test_pgc_internal parameter test."),
+			NULL
+		},
+		&test_pgc_internal,
+		2, 0, 1024,
+		NULL, NULL, NULL
+	},        
 
 	/* End-of-list marker */
 	{
