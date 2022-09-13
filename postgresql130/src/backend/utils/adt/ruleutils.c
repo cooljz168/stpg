@@ -8623,6 +8623,9 @@ get_rule_expr(Node *node, deparse_context *context,
 					case SVFOP_CURRENT_DATE:
 						appendStringInfoString(buf, "CURRENT_DATE");
 						break;
+                    case SVFOP_SYSDATE:
+                        appendStringInfoString(buf, "SYSDATE");
+                        break;
 					case SVFOP_CURRENT_TIME:
 						appendStringInfoString(buf, "CURRENT_TIME");
 						break;

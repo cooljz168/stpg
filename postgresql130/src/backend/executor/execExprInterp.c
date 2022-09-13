@@ -2450,6 +2450,7 @@ ExecEvalSQLValueFunction(ExprState *state, ExprEvalStep *op)
 			break;
 		case SVFOP_LOCALTIMESTAMP:
 		case SVFOP_LOCALTIMESTAMP_N:
+        case SVFOP_SYSDATE:
 			*op->resvalue = TimestampGetDatum(GetSQLLocalTimestamp(svf->typmod));
 			break;
 		case SVFOP_CURRENT_ROLE:

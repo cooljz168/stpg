@@ -1862,6 +1862,9 @@ FigureColnameInternal(Node *node, char **name)
 				case SVFOP_CURRENT_DATE:
 					*name = "current_date";
 					return 2;
+                case SVFOP_SYSDATE:
+                    *name = "sysdate";
+                    return 2;
 				case SVFOP_CURRENT_TIME:
 				case SVFOP_CURRENT_TIME_N:
 					*name = "current_time";

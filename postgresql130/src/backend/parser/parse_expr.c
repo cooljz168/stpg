@@ -2411,6 +2411,7 @@ transformSQLValueFunction(ParseState *pstate, SQLValueFunction *svf)
 			svf->typmod = anytime_typmod_check(false, svf->typmod);
 			break;
 		case SVFOP_LOCALTIMESTAMP:
+        case SVFOP_SYSDATE:
 			svf->type = TIMESTAMPOID;
 			break;
 		case SVFOP_LOCALTIMESTAMP_N:
