@@ -555,6 +555,13 @@ typedef struct NullableDatum
 
 #define PointerGetDatum(X) ((Datum) (X))
 
+ /*
+  * SpacePointerGetDatum
+  *		Returns datum representation for a space pointer.
+  */
+
+#define SpacePointerGetDatum(X) ((Datum) (X))
+
 /*
  * DatumGetCString
  *		Returns C string (null-terminated string) value of a datum.

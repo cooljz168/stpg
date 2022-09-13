@@ -244,6 +244,55 @@ pair_decode(char *str, float8 *x, float8 *y, char **endptr_p,
 }
 
 static void
+pair_decode_space(char* str, float8* x, float8* y, float8* z, char** endptr_p, const char* type_name, const char* orig_string)
+{
+	bool		has_delim;
+
+	while (isspace((unsigned char)*str))
+		str++;
+	if ((has_delim = (*str == LDELIM)))
+		str++;
+
+	*x = float8in_internal(str, &str, type_name, orig_string);
+
+	if (*str++ != DELIM)
+		ereport(ERROR,
+		(errcode(ERRCODE_INVALID_TEXT_REPRESENTATION),
+			errmsg("invalid input syntax for type %s: \"%s\"",
+				type_name, orig_string)));
+
+	*y = float8in_internal(str, &str, type_name, orig_string);
+
+	if (*str++ != DELIM)
+		ereport(ERROR,
+		(errcode(ERRCODE_INVALID_TEXT_REPRESENTATION),
+			errmsg("invalid input syntax for type %s: \"%s\"",
+				type_name, orig_string)));
+
+	*z = float8in_internal(str, &str, type_name, orig_string);
+
+	if (has_delim)
+	{
+		if (*str++ != RDELIM)
+			ereport(ERROR,
+			(errcode(ERRCODE_INVALID_TEXT_REPRESENTATION),
+				errmsg("invalid input syntax for type %s: \"%s\"",
+					type_name, orig_string)));
+		while (isspace((unsigned char)*str))
+			str++;
+	}
+
+	/* report stopping point if wanted, else complain if not end of string */
+	if (endptr_p)
+		*endptr_p = str;
+	else if (*str != '\0')
+		ereport(ERROR,
+		(errcode(ERRCODE_INVALID_TEXT_REPRESENTATION),
+			errmsg("invalid input syntax for type %s: \"%s\"",
+				type_name, orig_string)));
+}
+
+static void
 pair_encode(float8 x, float8 y, StringInfo str)
 {
 	char	   *xstr = float8out_internal(x);
@@ -252,6 +301,19 @@ pair_encode(float8 x, float8 y, StringInfo str)
 	appendStringInfo(str, "%s,%s", xstr, ystr);
 	pfree(xstr);
 	pfree(ystr);
+}
+
+static void
+pair_encode_space(float8 x, float8 y, float8 z,StringInfo str)
+{
+	char* xstr = float8out_internal(x);
+	char* ystr = float8out_internal(y);
+	char* zstr = float8out_internal(z);
+
+	appendStringInfo(str, "%s,%s,%s", xstr, ystr, zstr);
+	pfree(xstr);
+	pfree(ystr);
+	pfree(zstr);
 }
 
 static void
@@ -367,6 +429,51 @@ path_encode(enum path_delim path_delim, int npts, Point *pt)
 			break;
 		case PATH_NONE:
 			break;
+	}
+
+	return str.data;
+}								/* path_encode() */
+
+static char*
+path_encode_space(enum path_delim path_delim, int npts, SpacePoint* pt)
+{
+	StringInfoData str;
+	int			i;
+
+	initStringInfo(&str);
+
+	switch (path_delim)
+	{
+	case PATH_CLOSED:
+		appendStringInfoChar(&str, LDELIM);
+		break;
+	case PATH_OPEN:
+		appendStringInfoChar(&str, LDELIM_EP);
+		break;
+	case PATH_NONE:
+		break;
+	}
+
+	for (i = 0; i < npts; i++)
+	{
+		if (i > 0)
+			appendStringInfoChar(&str, DELIM);
+		appendStringInfoChar(&str, LDELIM);
+		pair_encode_space(pt->x, pt->y, pt->z, &str);
+		appendStringInfoChar(&str, RDELIM);
+		pt++;
+	}
+
+	switch (path_delim)
+	{
+	case PATH_CLOSED:
+		appendStringInfoChar(&str, RDELIM);
+		break;
+	case PATH_OPEN:
+		appendStringInfoChar(&str, RDELIM_EP);
+		break;
+	case PATH_NONE:
+		break;
 	}
 
 	return str.data;
@@ -1845,6 +1952,80 @@ point_construct(Point *result, float8 x, float8 y)
 	result->y = y;
 }
 
+/***********************************************************************
+ **
+ **		Routines for 3D points.
+ **
+ ***********************************************************************/
+
+ /*----------------------------------------------------------
+  *	String to Spacepoint, point to string conversion.
+  *		External format:
+  *				"(x,y,z)"
+  *				"x,y,z"
+  *---------------------------------------------------------*/
+
+Datum
+spacepoint_in(PG_FUNCTION_ARGS)
+{
+	char* str = PG_GETARG_CSTRING(0);
+	SpacePoint* point = (SpacePoint*)palloc(sizeof(SpacePoint));
+
+	pair_decode_space(str, &point->x, &point->y, &point->z, NULL, "point", str);
+	PG_RETURN_SPACEPOINT_P(point);
+}
+
+Datum
+spacepoint_out(PG_FUNCTION_ARGS)
+{
+	SpacePoint* pt = PG_GETARG_SPACEPOINT_P(0);
+
+	PG_RETURN_CSTRING(path_encode_space(PATH_NONE, 1, pt));
+}
+
+/*
+ *		spacepoint_recv			- converts external binary format to point
+ */
+Datum
+spacepoint_recv(PG_FUNCTION_ARGS)
+{
+	StringInfo	buf = (StringInfo)PG_GETARG_POINTER(0);
+	SpacePoint* point;
+
+	point = (SpacePoint*)palloc(sizeof(SpacePoint));
+	point->x = pq_getmsgfloat8(buf);
+	point->y = pq_getmsgfloat8(buf);
+	point->z = pq_getmsgfloat8(buf);
+	PG_RETURN_SPACEPOINT_P(point);
+}
+
+/*
+ *		spacepoint_send			- converts point to binary format
+ */
+Datum
+spacepoint_send(PG_FUNCTION_ARGS)
+{
+	SpacePoint* pt = PG_GETARG_SPACEPOINT_P(0);
+	StringInfoData buf;
+
+	pq_begintypsend(&buf);
+	pq_sendfloat8(&buf, pt->x);
+	pq_sendfloat8(&buf, pt->y);
+	pq_sendfloat8(&buf, pt->z);
+	PG_RETURN_BYTEA_P(pq_endtypsend(&buf));
+}
+
+
+/*
+ * Initialize a space point
+ */
+static inline void
+spacepoint_construct(SpacePoint* result, float8 x, float8 y ,float8 z)
+{
+	result->x = x;
+	result->y = y;
+	result->z = z;
+}
 
 /*----------------------------------------------------------
  *	Relational operators for Points.
@@ -1960,6 +2141,52 @@ point_dt(Point *pt1, Point *pt2)
 {
 	return HYPOT(float8_mi(pt1->x, pt2->x), float8_mi(pt1->y, pt2->y));
 }
+
+static inline float8
+spacepoint_dt(SpacePoint* pt1, SpacePoint* pt2)
+{
+	float8 x = float8_mi(pt1->x, pt2->x);
+	float8 y = float8_mi(pt1->y, pt2->y);
+	float8 z = float8_mi(pt1->z, pt2->z);
+
+	return pg_hypot_3(x, y, z);
+}
+
+Datum
+spacepoint_distance(PG_FUNCTION_ARGS)
+{
+	SpacePoint* pt1 = PG_GETARG_SPACEPOINT_P(0);
+	SpacePoint* pt2 = PG_GETARG_SPACEPOINT_P(1);
+
+	PG_RETURN_FLOAT8(spacepoint_dt(pt1, pt2));
+}
+
+Datum
+spacepoint_area(PG_FUNCTION_ARGS)
+{
+	SpacePoint* pt1 = PG_GETARG_SPACEPOINT_P(0);
+	SpacePoint* pt2 = PG_GETARG_SPACEPOINT_P(1);
+
+	float8 distance = spacepoint_dt(pt1, pt2);
+	float8 area = 0.5 * distance * distance;
+	PG_RETURN_FLOAT8(area);
+}
+
+Datum
+spacepoint_volume(PG_FUNCTION_ARGS)
+{
+	SpacePoint* pt1 = PG_GETARG_SPACEPOINT_P(0);
+	SpacePoint* pt2 = PG_GETARG_SPACEPOINT_P(1);
+
+	float8 _long, _wide, _high;
+
+	_long = fabs(float8_mi(pt1->x, pt2->x));
+	_wide = fabs(float8_mi(pt1->y, pt2->y));
+	_high = fabs(float8_mi(pt1->z, pt2->z));
+
+	PG_RETURN_FLOAT8(_long * _wide * _high);
+}
+
 
 Datum
 point_slope(PG_FUNCTION_ARGS)
@@ -4092,6 +4319,20 @@ construct_point(PG_FUNCTION_ARGS)
 	PG_RETURN_POINT_P(result);
 }
 
+Datum
+construct_spacepoint(PG_FUNCTION_ARGS)
+{
+	float8		x = PG_GETARG_FLOAT8(0);
+	float8		y = PG_GETARG_FLOAT8(1);
+	float8		z = PG_GETARG_FLOAT8(2);
+	SpacePoint* result;
+
+	result = (SpacePoint*)palloc(sizeof(SpacePoint));
+
+	spacepoint_construct(result, x, y, z);
+
+	PG_RETURN_SPACEPOINT_P(result);
+}
 
 static inline void
 point_add_point(Point *result, Point *pt1, Point *pt2)
@@ -5547,6 +5788,59 @@ pg_hypot(float8 x, float8 y)
 	/* Determine the hypotenuse */
 	yx = y / x;
 	result = x * sqrt(1.0 + (yx * yx));
+
+	if (unlikely(isinf(result)))
+		float_overflow_error();
+	if (unlikely(result == 0.0))
+		float_underflow_error();
+
+	return result;
+}
+
+/*
+* sort:from big to small
+*/
+void mysort(float8 *x, float8 *y, float8 *z)
+{
+	float8 t = 0;
+	if (*x < *y)
+	{
+		t = *x; *x = *y; *y = t;
+	}
+	if (*y < *z)
+	{
+		t = *y; *y = *z; *z = t;
+	}
+	if (*x < *y)
+	{
+		t = *x; *x = *y; *y = t;
+	}
+}
+
+float8
+pg_hypot_3(float8 x, float8 y, float8 z)
+{
+	float8		yx, zx, result;
+
+	/* Handle INF and NaN properly */
+	if (isinf(x) || isinf(y) || isinf(z))
+		return get_float8_infinity();
+
+	if (isnan(x) || isnan(y) || isnan(z))
+		return get_float8_nan();
+
+	/* Else, drop any minus signs */
+	x = fabs(x);
+	y = fabs(y);
+	z = fabs(z);
+
+	mysort(&x, &y, &z);
+
+	/* Determine the hypotenuse */
+
+	yx = y / x;
+	zx = z / x;
+	result = x * sqrt(1.0 + (yx * yx) + (zx * zx));
 
 	if (unlikely(isinf(result)))
 		float_overflow_error();

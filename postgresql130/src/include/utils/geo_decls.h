@@ -58,6 +58,13 @@ typedef struct
 				y;
 } Point;
 
+/*---------------------------------------------------------------------
+ * SpacePoint - (x,y,z)
+ *-------------------------------------------------------------------*/
+typedef struct
+{
+	float8		x, y, z;
+} SpacePoint;
 
 /*---------------------------------------------------------------------
  * LSEG - A straight line, specified by endpoints.
@@ -133,8 +140,11 @@ typedef struct
 
 #define DatumGetPointP(X)	 ((Point *) DatumGetPointer(X))
 #define PointPGetDatum(X)	 PointerGetDatum(X)
+#define SpacePointPGetDatum(X)	 SpacePointerGetDatum(X)
 #define PG_GETARG_POINT_P(n) DatumGetPointP(PG_GETARG_DATUM(n))
+#define PG_GETARG_SPACEPOINT_P(n) DatumGetPointP(PG_GETARG_DATUM(n))
 #define PG_RETURN_POINT_P(x) return PointPGetDatum(x)
+#define PG_RETURN_SPACEPOINT_P(x) return SpacePointPGetDatum(x)
 
 #define DatumGetLsegP(X)	((LSEG *) DatumGetPointer(X))
 #define LsegPGetDatum(X)	PointerGetDatum(X)
@@ -176,5 +186,6 @@ typedef struct
  */
 
 extern float8 pg_hypot(float8 x, float8 y);
+extern float8 pg_hypot_3(float8 x, float8 y, float8 z);
 
 #endif							/* GEO_DECLS_H */

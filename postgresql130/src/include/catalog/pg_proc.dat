@@ -345,6 +345,14 @@
 { oid => '118', descr => 'I/O',
   proname => 'point_out', prorettype => 'cstring', proargtypes => 'point',
   prosrc => 'point_out' },
+
+{ oid => '6125', descr => 'I/O',
+  proname => 'spacepoint_in', prorettype => 'spacepoint', proargtypes => 'cstring',
+  prosrc => 'spacepoint_in' },
+{ oid => '6126', descr => 'I/O',
+  proname => 'spacepoint_out', prorettype => 'cstring', proargtypes => 'spacepoint',
+  prosrc => 'spacepoint_out' },
+
 { oid => '119', descr => 'I/O',
   proname => 'lseg_in', prorettype => 'lseg', proargtypes => 'cstring',
   prosrc => 'lseg_in' },
@@ -2013,6 +2021,19 @@
 { oid => '991',
   proname => 'point_distance', prorettype => 'float8',
   proargtypes => 'point point', prosrc => 'point_distance' },
+
+{ oid => '6129',
+  proname => 'spacepoint_distance', prorettype => 'float8',
+  proargtypes => 'spacepoint spacepoint', prosrc => 'spacepoint_distance' },
+
+{ oid => '6130',
+  proname => 'spacepoint_area', prorettype => 'float8',
+  proargtypes => 'spacepoint spacepoint', prosrc => 'spacepoint_area' },
+
+{ oid => '6131',
+  proname => 'spacepoint_volume', prorettype => 'float8',
+  proargtypes => 'spacepoint spacepoint', prosrc => 'spacepoint_volume' },
+
 { oid => '992', descr => 'slope between points',
   proname => 'slope', prorettype => 'float8', proargtypes => 'point point',
   prosrc => 'point_slope' },
@@ -2983,6 +3004,9 @@
 { oid => '1440', descr => 'convert x, y to point',
   proname => 'point', prorettype => 'point', proargtypes => 'float8 float8',
   prosrc => 'construct_point' },
+{ oid => '6124', descr => 'convert x, y,z to space point',
+  proname => 'spacepoint', prorettype => 'spacepoint', proargtypes => 'float8 float8 float8',
+  prosrc => 'construct_spacepoint' },
 { oid => '1441',
   proname => 'point_add', prorettype => 'point', proargtypes => 'point point',
   prosrc => 'point_add' },
@@ -7475,6 +7499,14 @@
 { oid => '2429', descr => 'I/O',
   proname => 'point_send', prorettype => 'bytea', proargtypes => 'point',
   prosrc => 'point_send' },
+  
+{ oid => '6127', descr => 'I/O',
+  proname => 'spacepoint_recv', prorettype => 'spacepoint', proargtypes => 'internal',
+  prosrc => 'spacepoint_recv' },
+{ oid => '6128', descr => 'I/O',
+  proname => 'spacepoint_send', prorettype => 'bytea', proargtypes => 'spacepoint',
+  prosrc => 'spacepoint_send' },
+
 { oid => '2430', descr => 'I/O',
   proname => 'bpcharrecv', provolatile => 's', prorettype => 'bpchar',
   proargtypes => 'internal oid int4', prosrc => 'bpcharrecv' },

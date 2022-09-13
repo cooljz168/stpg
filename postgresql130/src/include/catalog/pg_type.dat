@@ -189,6 +189,13 @@
   typname => 'point', typlen => '16', typbyval => 'f', typcategory => 'G',
   typelem => 'float8', typinput => 'point_in', typoutput => 'point_out',
   typreceive => 'point_recv', typsend => 'point_send', typalign => 'd' },
+
+{ oid => '6123', array_type_oid => '6135',
+  descr => 'geometric space point \'(x, y, z)\'',
+  typname => 'spacepoint', typlen => '24', typbyval => 'f', typcategory => 'G',
+  typelem => 'float8', typinput => 'spacepoint_in', typoutput => 'spacepoint_out',
+  typreceive => 'spacepoint_recv', typsend => 'spacepoint_send', typalign => 'd' },
+
 { oid => '601', array_type_oid => '1018',
   descr => 'geometric line segment \'(pt1,pt2)\'',
   typname => 'lseg', typlen => '32', typbyval => 'f', typcategory => 'G',
