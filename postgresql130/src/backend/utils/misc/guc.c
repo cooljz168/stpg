@@ -2040,6 +2040,17 @@ static struct config_bool ConfigureNamesBool[] =
 		NULL, NULL, NULL
 	},
 
+    {
+		{"orafce_case", PGC_INTERNAL, PRESET_OPTIONS,
+			gettext_noop("The case of create extension orafce by default."),
+			NULL,
+			GUC_REPORT | GUC_NOT_IN_SAMPLE | GUC_DISALLOW_IN_FILE
+		},
+		&orafce_case,
+		false,
+		NULL, NULL, NULL
+	},
+
 	/* End-of-list marker */
 	{
 		{NULL, 0, 0, NULL, NULL}, NULL, false, NULL, NULL, NULL
@@ -4805,6 +4816,9 @@ static bool guc_dirty;			/* true if need to do commit/abort work */
 static bool reporting_enabled;	/* true to enable GUC_REPORT */
 
 static int	GUCNestLevel = 0;	/* 1 when in main transaction */
+
+bool		orafce_case = false;
+
 
 
 static int	guc_var_compare(const void *a, const void *b);

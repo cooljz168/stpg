@@ -51,6 +51,8 @@
 #include "utils/relmapper.h"
 
 uint32		bootstrap_data_checksum_version = 0;	/* No checksum */
+bool        orafce_cased_state = false;
+
 
 
 #define ALLOC(t, c) \
@@ -226,7 +228,7 @@ AuxiliaryProcessMain(int argc, char *argv[])
 	/* If no -x argument, we are a CheckerProcess */
 	MyAuxProcType = CheckerProcess;
 
-	while ((flag = getopt(argc, argv, "B:c:d:D:Fkr:x:X:-:")) != -1)
+	while ((flag = getopt(argc, argv, "B:c:d:D:Fkor:x:X:-:")) != -1)
 	{
 		switch (flag)
 		{
@@ -255,6 +257,10 @@ AuxiliaryProcessMain(int argc, char *argv[])
 			case 'k':
 				bootstrap_data_checksum_version = PG_DATA_CHECKSUM_VERSION;
 				break;
+    		case 'o':
+    			orafce_cased_state = true;
+    			SetConfigOption("orafce_case", "true", PGC_INTERNAL, PGC_S_OVERRIDE);
+    			break;            
 			case 'r':
 				strlcpy(OutputFileName, optarg, MAXPGPATH);
 				break;

@@ -168,6 +168,8 @@ static bool caught_signal = false;
 static bool output_failed = false;
 static int	output_errno = 0;
 static char *pgdata_native;
+static bool has_orafce_flag = false;
+
 
 /* defaults */
 static int	n_connections = 10;
@@ -257,6 +259,8 @@ static void setup_privileges(FILE *cmdfd);
 static void set_info_version(void);
 static void setup_schema(FILE *cmdfd);
 static void load_plpgsql(FILE *cmdfd);
+static void load_orafce(FILE *cmdfd);
+
 static void vacuum_db(FILE *cmdfd);
 static void make_template0(FILE *cmdfd);
 static void make_postgres(FILE *cmdfd);
@@ -1416,10 +1420,11 @@ bootstrap_template1(void)
 	unsetenv("PGCLIENTENCODING");
 
 	snprintf(cmd, sizeof(cmd),
-			 "\"%s\" --boot -x1 -X %u %s %s %s",
+			 "\"%s\" --boot -x1 -X %u %s %s %s %s",
 			 backend_exec,
 			 wal_segment_size_mb * (1024 * 1024),
 			 data_checksums ? "-k" : "",
+			 has_orafce_flag ? "-o" : "",
 			 boot_options,
 			 debug ? "-d 5" : "");
 
@@ -1936,6 +1941,15 @@ static void
 load_plpgsql(FILE *cmdfd)
 {
 	PG_CMD_PUTS("CREATE EXTENSION plpgsql;\n\n");
+}
+
+/*
+ * load extension -- Orafce
+ */
+static void
+load_orafce(FILE *cmdfd)
+{
+	PG_CMD_PUTS("CREATE EXTENSION orafce;\n\n");
 }
 
 /*
@@ -2937,6 +2951,8 @@ initialize_data_directory(void)
 	setup_schema(cmdfd);
 
 	load_plpgsql(cmdfd);
+    
+    load_orafce(cmdfd);
 
 	vacuum_db(cmdfd);
 
@@ -2984,6 +3000,7 @@ main(int argc, char *argv[])
 		{"wal-segsize", required_argument, NULL, 12},
 		{"data-checksums", no_argument, NULL, 'k'},
 		{"allow-group-access", no_argument, NULL, 'g'},
+		{"hasOrafce", no_argument, NULL, 13},
 		{NULL, 0, NULL, 0}
 	};
 
@@ -3122,6 +3139,9 @@ main(int argc, char *argv[])
 			case 'g':
 				SetDataDirectoryCreatePerm(PG_DIR_MODE_GROUP);
 				break;
+            case 13:
+        		has_orafce_flag = true;
+        		break;
 			default:
 				/* getopt_long already emitted a complaint */
 				fprintf(stderr, _("Try \"%s --help\" for more information.\n"),

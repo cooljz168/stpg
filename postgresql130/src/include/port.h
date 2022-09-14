@@ -37,6 +37,9 @@ typedef SOCKET pgsocket;
 #define PGINVALID_SOCKET INVALID_SOCKET
 #endif
 
+extern PGDLLIMPORT bool orafce_case;
+
+
 /* non-blocking */
 extern bool pg_set_noblock(pgsocket sock);
 extern bool pg_set_block(pgsocket sock);

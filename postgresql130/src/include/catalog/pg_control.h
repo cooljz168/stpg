@@ -228,6 +228,8 @@ typedef struct ControlFileData
 
 	/* CRC of all above ... MUST BE LAST! */
 	pg_crc32c	crc;
+
+    bool orafce_case;
 } ControlFileData;
 
 /*

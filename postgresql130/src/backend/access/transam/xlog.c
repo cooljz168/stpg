@@ -80,6 +80,8 @@
 #include "utils/timestamp.h"
 
 extern uint32 bootstrap_data_checksum_version;
+extern bool        orafce_cased_state;
+
 
 /* Unsupported old recovery command file names (relative to $PGDATA) */
 #define RECOVERY_COMMAND_FILE	"recovery.conf"
@@ -4893,6 +4895,8 @@ ReadControlFile(void)
 	/* Make the initdb settings visible as GUC variables, too */
 	SetConfigOption("data_checksums", DataChecksumsEnabled() ? "yes" : "no",
 					PGC_INTERNAL, PGC_S_OVERRIDE);
+
+    SetConfigOption("orafce_case", DataOrafceCaseEnabled() ? "true" : "false",PGC_INTERNAL, PGC_S_OVERRIDE);                    
 }
 
 /*
@@ -5338,6 +5342,7 @@ BootStrapXLOG(void)
 	ControlFile->time = checkPoint.time;
 	ControlFile->checkPoint = checkPoint.redo;
 	ControlFile->checkPointCopy = checkPoint;
+    ControlFile->orafce_case = orafce_cased_state;
 
 	/* some additional ControlFile fields are set in WriteControlFile() */
 	WriteControlFile();
@@ -12703,4 +12708,11 @@ void
 XLogRequestWalReceiverReply(void)
 {
 	doRequestWalReceiverReply = true;
+}
+
+bool
+DataOrafceCaseEnabled(void)
+{
+	Assert(ControlFile != NULL);
+	return (ControlFile->orafce_case == true);
 }
