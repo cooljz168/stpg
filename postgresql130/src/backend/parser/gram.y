@@ -8692,6 +8692,16 @@ RenameStmt: ALTER AGGREGATE aggregate_with_argtypes RENAME TO name
 					n->missing_ok = false;
 					$$ = (Node *)n;
 				}
+			| RENAME relation_expr TO name
+				{
+					RenameStmt *n = makeNode(RenameStmt);
+					n->renameType = OBJECT_TABLERENAME;
+					n->relation = $2;
+					n->subname = NULL;
+					n->newname = $4;
+					n->missing_ok = false;
+					$$ = (Node *)n;
+				}            
 			| ALTER TABLE IF_P EXISTS relation_expr RENAME TO name
 				{
 					RenameStmt *n = makeNode(RenameStmt);

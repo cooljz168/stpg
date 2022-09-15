@@ -2231,6 +2231,9 @@ AlterObjectTypeCommandTag(ObjectType objtype)
 		case OBJECT_TABCONSTRAINT:
 			tag = CMDTAG_ALTER_TABLE;
 			break;
+		case OBJECT_TABLERENAME:
+			tag = CMDTAG_ALTER_TABLERENAME;
+			break;        
 		case OBJECT_TABLESPACE:
 			tag = CMDTAG_ALTER_TABLESPACE;
 			break;
